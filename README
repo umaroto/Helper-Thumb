@@ -1,0 +1,15 @@
+- Configuração:
+
+Constant na linha 3 contendo a imagem utilizado para default
+Diretório das thumbs (cache) na linha 9 - O helper criará essa pasta se tiver permissão.
+
+
+- Utilização:
+
+Controller
+public $helpers = array ('Thumb');
+
+View
+$width = 500;
+$height = 300;
+echo "<img src='".$this->Thumb->resize("imagem.jpg", $width, $height)."' />";
