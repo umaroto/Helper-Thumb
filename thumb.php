@@ -16,19 +16,32 @@ class ThumbHelper extends AppHelper {
         return $imgDir;
     }
     
-    private function _imgCache($filename, $width, $height)
+    private function _imgCache($filename, $width, $height, $dirname = null)
     {
-        $imgDir = $this->_cacheDir() . $width . 'x' . $height . '_' . $filename . '.jpg';
+        $imgDir = $this->_cacheDir() . $dirname . $width . 'x' . $height . '_' . $filename . '.jpg';
         return $imgDir;
     }
     
     function resize($path, $width = 800, $height = 600)
     {
-        $cachedir = WWW_ROOT . $this->_cacheDir();
-        
+        $cachedir = WWW_ROOT . $this->_cacheDir();        
         if(!is_dir($cachedir))
         {
             mkdir($cachedir, 0777);
+        }
+        
+        $dir = dirname($path);
+        if(!is_dir($dir))
+        {
+            $folders = explode("/", $dir);
+            foreach($folders as $folder)
+            {
+                $cachedir .= $folder . DS;
+                if(!is_dir($cachedir))
+                {
+                    mkdir($cachedir, 0777);
+                }
+            }
         }
         
         if(!file_exists($this->_imgDir($path)))
@@ -48,7 +61,7 @@ class ThumbHelper extends AppHelper {
                     case 'image/gif':
                     case 'image/png':
                     case 'image/bmp':
-                        $cachefile = $this->_handleImage($this->_imgDir($path), $width, $height);
+                        $cachefile = $this->_handleImage($this->_imgDir($path), $width, $height, dirname($path));
                         break;
                     default:
                         $cachefile = $this->_handleImage($this->_imgDir(IMGDEFAULT), $width, $height);
@@ -91,10 +104,11 @@ class ThumbHelper extends AppHelper {
         return ($num > 0) ? $num * -1 : $num;
     }
     
-    private function _handleImage($fullpath, $width, $height)
+    private function _handleImage($fullpath, $width, $height, $dirname = null)
     {
         $filename = $this->_imageName($fullpath);
-        $cachefile = $this->_imgCache($filename, $width, $height);
+        $dirname = strlen($dirname) > 1 ? $dirname .= DS : "";
+        $cachefile = $this->_imgCache($filename, $width, $height, $dirname);
 
         $imageSize = getimagesize($fullpath);
         $process = imagecreatetruecolor($width, $height);
