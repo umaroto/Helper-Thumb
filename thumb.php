@@ -1,6 +1,6 @@
 <?php
 //Imagem default para caso de nao encontrar a imagem solicitada. Deve estar em img/
-define("IMGDEFAULT", "default.jpg");
+define("IMGDEFAULT", "img/default.jpg");
 
 class ThumbHelper extends AppHelper {
     
@@ -8,12 +8,6 @@ class ThumbHelper extends AppHelper {
     {
         $cacheDir = 'img' . DS . 'cache' . DS;
         return $cacheDir;
-    }
-    
-    private function _imgDir($filename) //Diretorio imagens
-    {
-        $imgDir = 'img' . DS . $filename;
-        return $imgDir;
     }
     
     private function _imgCache($filename, $width, $height, $dirname = null)
@@ -31,7 +25,7 @@ class ThumbHelper extends AppHelper {
         }
         
         $dir = dirname($path);
-        if(!is_dir($dir))
+        if(!is_dir($cachedir . DS . $dir))
         {
             $folders = explode("/", $dir);
             foreach($folders as $folder)
@@ -44,9 +38,9 @@ class ThumbHelper extends AppHelper {
             }
         }
         
-        if(!file_exists($this->_imgDir($path)))
+        if(!file_exists($path))
         {
-            $cachefile = $this->_handleImage($this->_imgDir(IMGDEFAULT), $width, $height);
+            $cachefile = $this->_handleImage(IMGDEFAULT, $width, $height);
         }
         else
         {
@@ -54,17 +48,17 @@ class ThumbHelper extends AppHelper {
             
             if($cachefile == false)
             {
-                $mime = mime_content_type($this->_imgDir($path));
+                $mime = mime_content_type($path);
                 switch($mime)
                 {
                     case 'image/jpeg':
                     case 'image/gif':
                     case 'image/png':
                     case 'image/bmp':
-                        $cachefile = $this->_handleImage($this->_imgDir($path), $width, $height, dirname($path));
+                        $cachefile = $this->_handleImage($path, $width, $height, dirname($path));
                         break;
                     default:
-                        $cachefile = $this->_handleImage($this->_imgDir(IMGDEFAULT), $width, $height);
+                        $cachefile = $this->_handleImage(IMGDEFAULT, $width, $height);
                 }
             }
         }
